@@ -22,10 +22,12 @@ def homogeneity_score(NotesByHouse, col_name):
     for house, notes in NotesByHouse.items():
         mean = calculateMean(notes)
         list_means.append(mean)
+
     mean_of_means = calculateMean(list_means)
     std = calculateStandardDeviation(list_means, mean_of_means)
-    result = std / abs(mean_of_means) if mean_of_means != 0 else 0
-    print(f"{result:.4f} : {col_name} ")
+
+    return std / abs(mean_of_means) if mean_of_means != 0 else 0
+    
 
 def main():
     if len(sys.argv) != 2:
@@ -45,6 +47,7 @@ def main():
     for j in range(len(numerical_cols), 16):
         axes[j // 4][j % 4].set_visible(False)
 
+    homogenity_scores = {}
     student_count = len(data['Hogwarts House'])
     for i, col in enumerate(numerical_cols):            # pour chaque colone numerique, on affiche un histogramme
         ax = axes[i // 4][i % 4]
@@ -54,7 +57,7 @@ def main():
             values = NotesByHouse[house]
             ax.hist(values, bins=20, alpha=0.5, label=house, color=color)
         
-        homogeneity_score(NotesByHouse, col)              # on affiche le score d'homogeneite pour la colone en cours
+        homogenity_scores[col] = homogeneity_score(NotesByHouse, col)              # on affiche le score d'homogeneite pour la colone en cours
         ax.set_title(col, fontsize=9)
         ax.set_ylabel('student count')
         ax.legend(fontsize=7)
@@ -62,6 +65,9 @@ def main():
 
     plt.tight_layout(pad=3.0)                           # pour eviter que les titres et les axes se chevauchent
     plt.savefig("histogram.png")
+    
+    best = min(homogenity_scores, key=homogenity_scores.get)
+    print(f"\nColonne la plus homogène: {best} avec un score de {homogenity_scores[best]:.4f}")
 
 
 
