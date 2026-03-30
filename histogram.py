@@ -1,21 +1,8 @@
 import sys
-from utils import read_csv, get_data_by_column, get_numerical_columns, calculateMean, calculateStandardDeviation
+from utils import read_csv, get_data_by_column, get_numerical_columns, calculateMean, calculateStandardDeviation, ListEachNotesByHouse
 
 import matplotlib.pyplot as plt
 
-def ListEachNotesByHouse(data, col_name):
-    Houses = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
-    NotesByHouse = {house: [] for house in Houses}
-
-    for i in range(len(data['Hogwarts House'])):
-        if data[col_name][i] == '' or data[col_name][i] is None:
-            continue
-        house = data['Hogwarts House'][i]
-        if house in Houses:
-            NotesByHouse[house].append(float(data[col_name][i]))
-    
-    
-    return NotesByHouse
 
 def homogeneity_score(NotesByHouse, col_name):
     list_means = []
@@ -48,7 +35,6 @@ def main():
         axes[j // 4][j % 4].set_visible(False)
 
     homogenity_scores = {}
-    student_count = len(data['Hogwarts House'])
     for i, col in enumerate(numerical_cols):            # pour chaque colone numerique, on affiche un histogramme
         ax = axes[i // 4][i % 4]
 
