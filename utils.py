@@ -55,3 +55,49 @@ def calculateStandardDeviation(values, mean):
     for num in values:
         total += math.pow(num - mean, 2)
     return math.sqrt(total / len(values))
+
+def findMin(values):
+    if len(values) == 0:
+        return None
+    
+    min_val = values[0]
+    for num in values:
+        if num < min_val:
+            min_val = num
+    
+    return min_val
+
+
+def findMax(values):
+    if len(values) == 0:
+        return None
+    
+    max_val = values[0]
+    for num in values:
+        if num > max_val:
+            max_val = num
+    
+    return max_val
+
+
+def calculatePercentile(values, percentile):
+    if len(values) == 0:
+        return None
+    
+    sorted_values = sorted(values)
+    
+    index = (percentile / 100.0) * (len(sorted_values) - 1)
+    
+    lower_index = int(index)
+    upper_index = lower_index + 1
+    
+    if upper_index >= len(sorted_values):
+        return sorted_values[lower_index]
+    
+    lower_value = sorted_values[lower_index]
+    upper_value = sorted_values[upper_index]
+    weight = index - lower_index
+    
+    percentile_value = lower_value + weight * (upper_value - lower_value)
+    
+    return percentile_value
