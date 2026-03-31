@@ -40,6 +40,20 @@ def get_data_by_column(data, col_name):
     
     return values
 
+def get_data_by_column_with_none(data, col_name):
+    values = []
+    
+    for val in data[col_name]:
+        if val == '' or val is None:
+            values.append(None)
+            continue
+        try:
+            values.append(float(val))
+        except ValueError:
+            continue
+    
+    return values
+
 def calculateMean(values):
     if len(values) == 0:
         return None
@@ -101,3 +115,15 @@ def calculatePercentile(values, percentile):
     percentile_value = lower_value + weight * (upper_value - lower_value)
     
     return percentile_value
+def ListEachNotesByHouse(data, col_name):
+    Houses = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
+    NotesByHouse = {house: [] for house in Houses}
+
+    for i in range(len(data['Hogwarts House'])):
+        if data[col_name][i] == '' or data[col_name][i] is None:
+            continue
+        house = data['Hogwarts House'][i]
+        if house in Houses:
+            NotesByHouse[house].append(float(data[col_name][i]))
+    
+    return NotesByHouse
