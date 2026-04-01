@@ -44,6 +44,9 @@ def main():
 
     for i in range(len_numerical_cols):
         for j in range(len_numerical_cols):
+            if (i < j):
+                axes[i][j].set_visible(False)  # on rend les shemas en dessous de la diagonale invisibles
+                continue
             ax = axes[i][j]
             ax.set_xticks([])
             ax.set_yticks([])
