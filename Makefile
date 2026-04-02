@@ -30,6 +30,9 @@ scatter:
 
 pair:
 	$(PYTHON) pair_plot.py $(DATASET_TRAIN)
+	
+logreg_train:
+	$(PYTHON) logreg_train.py $(DATASET_TRAIN)
 
 visu: histogram scatter pair
 
