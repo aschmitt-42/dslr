@@ -15,14 +15,24 @@ def predict(notesByStudents, weights):
         proba.append(sigmoid(z))
     return proba
 
-# def GradientDescent(notesByStudents, labels, weights, learning_rate=0.1):
-#     proba = predict(notesByStudents, weights)
-
-#     errors = [proba[i] - labels[i] for i in range(len(proba))]
+def GradientDescent(notesByStudents, labels, weights, learning_rate=0.1):
+    n = len(notesByStudents)
+    proba = predict(notesByStudents, weights)
+    errors = [proba[i] - labels[i] for i in range(n)]
     
-#         weights[0] -= learning_rate * error  # mise à jour du biais
-#         for j in range(len(weights) - 1):
-#             weights[j + 1] -= learning_rate * error * notesByStudents[i][j]  # mise à jour des poids
+    gradient_w0 = sum(errors) / n 
+
+    gradient_wj = [0.0] * (len(weights) - 1)
+    for j in range(len(weights) - 1):
+        for i in range(n):
+            gradient_wj[j] += errors[i] * notesByStudents[i][j]
+        gradient_wj[j] /= n
+
+    weights[0] -= learning_rate * gradient_w0
+    for j in range(len(weights) - 1):
+        weights[j + 1] -= learning_rate * gradient_wj[j]
+    
+    return weights
 
 def get_labels(data, house):
     labels = []
@@ -79,6 +89,20 @@ def main():
     notesByStudents = GetNotesByStudents(data, numerical_cols, means)
     
     normalizedNotes = normalize(notesByStudents)
+
+    houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin']
+
+    for house in houses:
+        weights = [0.0] * (len(numerical_cols) + 1)
+        labels = get_labels(data, house)
+        for _ in range(1000):
+            weights = GradientDescent(normalizedNotes, labels, weights, learning_rate=0.1)
+        # print(f"Weights for {house}: {weights}")
+        predictions = predict(normalizedNotes, weights)
+        correct = sum(1 for p, l in zip(predictions, labels) if (p >= 0.5) == l)
+        accuracy = correct / len(labels) * 100
+        print(f"{house}: {accuracy:.2f}%")
+  
     
 
 if __name__ == "__main__":
