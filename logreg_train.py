@@ -1,5 +1,6 @@
 import sys
 import math
+import json
 from utils import read_csv, get_numerical_columns, ListEachNotesByHouse, get_data_by_column, calculateMean
 
 def sigmoid(z):
@@ -15,22 +16,23 @@ def predict(notesByStudents, weights):
         proba.append(sigmoid(z))
     return proba
 
+# on calcule les gradients pour chaque poids et on les met a jour en fonction du learning rate
 def GradientDescent(notesByStudents, labels, weights, learning_rate=0.1):
     n = len(notesByStudents)
     proba = predict(notesByStudents, weights)
     errors = [proba[i] - labels[i] for i in range(n)]
     
-    gradient_w0 = sum(errors) / n 
+    temp_w0 = sum(errors) / n 
 
-    gradient_wj = [0.0] * (len(weights) - 1)
+    temp_wj = [0.0] * (len(weights) - 1)
     for j in range(len(weights) - 1):
         for i in range(n):
-            gradient_wj[j] += errors[i] * notesByStudents[i][j]
-        gradient_wj[j] /= n
+            temp_wj[j] += errors[i] * notesByStudents[i][j]
+        temp_wj[j] /= n
 
-    weights[0] -= learning_rate * gradient_w0
+    weights[0] -= learning_rate * temp_w0
     for j in range(len(weights) - 1):
-        weights[j + 1] -= learning_rate * gradient_wj[j]
+        weights[j + 1] -= learning_rate * temp_wj[j]
     
     return weights
 
@@ -67,7 +69,8 @@ def get_means(data, numerical_cols):
         means[col] = calculateMean(values)
     return means
 
-def GetNotesByStudents(data, numerical_cols, means):
+def GetNotesByStudents(data, numerical_cols):
+    means = get_means(data, numerical_cols)
     nbStudents = len(data["Index"])
     notes  = [[] for _ in range(nbStudents)]
 
@@ -83,25 +86,43 @@ def main():
     if len(sys.argv) != 2:
         print("Usage: python3 histogram.py <dataset>")
         return
+
     header, data = read_csv(sys.argv[1])
     numerical_cols = get_numerical_columns(header)
-    means = get_means(data, numerical_cols)
-    notesByStudents = GetNotesByStudents(data, numerical_cols, means)
+    notesByStudents = GetNotesByStudents(data, numerical_cols) # Chaque element de la liste correspond a un etudiant et contient la liste de ses notes
     
-    normalizedNotes = normalize(notesByStudents)
+    normalizedNotes = normalize(notesByStudents) # Normalisation des notes pour que les valeurs soient entre 0 et 1, ce qui facilite l'apprentissage du modele de regression logistique
 
     houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin']
+    weights_by_house = {}
 
     for house in houses:
-        weights = [0.0] * (len(numerical_cols) + 1)
-        labels = get_labels(data, house)
-        for _ in range(1000):
+        weights = [0.0] * (len(numerical_cols) + 1) # Initialisation des poids a 0
+        labels = get_labels(data, house)            # labels indique si etudiant appartient a la maison en cours ou pas
+        for _ in range(1000):                       # Entraînement du modèle de régression logistique
             weights = GradientDescent(normalizedNotes, labels, weights, learning_rate=0.1)
-        # print(f"Weights for {house}: {weights}")
-        predictions = predict(normalizedNotes, weights)
-        correct = sum(1 for p, l in zip(predictions, labels) if (p >= 0.5) == l)
-        accuracy = correct / len(labels) * 100
-        print(f"{house}: {accuracy:.2f}%")
+        weights_by_house[house] = weights
+
+    mins = []
+    maxs = []
+    for col in numerical_cols:
+        col_values = get_data_by_column(data, col)
+        mins.append(min(col_values))
+        maxs.append(max(col_values))
+    print("Mins:", mins)
+    try:
+        with open(f"weights.json", "w", encoding="utf-8") as f:
+            json.dump(weights_by_house, f, indent=2)
+    except Exception as e:
+        print(f"Probleme avec le json : {e}")
+        exit(1)
+        
+        # predictions = predict(normalizedNotes, weights)
+        # correct = sum(1 for p, l in zip(predictions, labels) if (p >= 0.5) == l)
+        # accuracy = correct / len(labels) * 100
+        # print(f"{house}: {accuracy:.2f}%")
+
+
   
     
 
