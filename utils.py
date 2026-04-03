@@ -115,6 +115,7 @@ def calculatePercentile(values, percentile):
     percentile_value = lower_value + weight * (upper_value - lower_value)
     
     return percentile_value
+
 def ListEachNotesByHouse(data, col_name):
     Houses = ['Ravenclaw', 'Slytherin', 'Gryffindor', 'Hufflepuff']
     NotesByHouse = {house: [] for house in Houses}
@@ -127,3 +128,31 @@ def ListEachNotesByHouse(data, col_name):
             NotesByHouse[house].append(float(data[col_name][i]))
     
     return NotesByHouse
+
+def get_means(data, numerical_cols):
+    means = {}
+    for col in numerical_cols:
+        values = get_data_by_column(data, col)
+        means[col] = calculateMean(values)
+    return means
+
+def GetNotesByStudents(data, numerical_cols):
+    means = get_means(data, numerical_cols)
+    nbStudents = len(data["Index"])
+    notes  = [[] for _ in range(nbStudents)]
+
+    for i in range(nbStudents):
+        for col in numerical_cols:
+            if (data[col][i] == '' or data[col][i] is None):
+                notes[i].append(means[col])
+            else:
+                notes[i].append(float(data[col][i]))
+    return notes
+
+# exp_pos / (1 + exp_pos) == 1 / (1 + exp(-value))
+def sigmoid(value):
+    if value >= 0:
+        exp_neg = math.exp(-value)
+        return 1 / (1 + exp_neg)
+    exp_pos = math.exp(value)
+    return exp_pos / (1 + exp_pos) 
