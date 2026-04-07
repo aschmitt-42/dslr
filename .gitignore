@@ -9,3 +9,5 @@ __pycache__/
 # Fichiers de données
 *.png
 *.json
+houses.csv
+weights.json

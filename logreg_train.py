@@ -85,13 +85,15 @@ def main():
     for house in houses:
         weights = [0.0] * (len(numerical_cols) + 1) # Initialisation des poids a 0
         labels = get_labels(data, house)            # labels indique si etudiant appartient a la maison
-        for _ in range(500):                       # Entraînement du modèle de régression logistique
+        for _ in range(500):                        # Entraînement du modèle de régression logistique
             weights = GradientDescent(normalizedNotes, labels, weights, learning_rate=0.1)
         weights_by_house[house] = weights
-        predictions = predict(normalizedNotes, weights)
-        correct = sum(1 for p, l in zip(predictions, labels) if (p >= 0.5) == l)
-        accuracy = correct / len(labels) * 100
-        print(f"{house}: {accuracy:.2f}%")
+
+        # # Calacul de l'accuracy du modèle pour chaque maison 
+        # predictions = predict(normalizedNotes, weights)
+        # correct = sum(1 for p, l in zip(predictions, labels) if (p >= 0.5) == l)
+        # accuracy = correct / len(labels) * 100
+        # print(f"{house}: {accuracy:.2f}%")
 
     model = { "weights": weights_by_house, "min": mins, "max": maxs }
     try:

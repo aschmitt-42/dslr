@@ -1,5 +1,7 @@
 import json
 import sys
+import csv
+
 
 from logreg_train import GetNotesByStudents
 from utils import get_numerical_columns, read_csv, sigmoid
@@ -40,7 +42,7 @@ def main():
     
     # normalisation des notes entre 0 et 1, évite que certaines features dominent et accélère la convergence du modèle
     normalizedNotes = normalizeNotes(notesByStudents, mins, maxs)
-
+    predicted_houses = []
     for i, student in enumerate(normalizedNotes):
         scores = {}
         for house, weights in weights_by_house.items():
@@ -50,10 +52,14 @@ def main():
             scores[house] = sigmoid(score)
         
         predicted_house = max(scores, key=scores.get)
-        print(f"{i},{predicted_house}")
+        predicted_houses.append(predicted_house)
 
+    with open("houses.csv", "w", newline="", encoding="utf-8") as f:
+        writer = csv.writer(f)
+        writer.writerow(["Index", "Hogwarts House"])
+        for i, house in enumerate(predicted_houses):
+            writer.writerow([i, house])
 
-    
 
 if __name__ == "__main__":
     main()
