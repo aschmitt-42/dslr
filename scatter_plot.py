@@ -1,5 +1,6 @@
 import sys
 import matplotlib.pyplot as plt
+from pair_plot import ListEachNotesByHouseWithTwoColumns
 from utils import read_csv, get_data_by_column, get_numerical_columns, calculateMean, calculateStandardDeviation, ListEachNotesByHouse, get_data_by_column_with_none
 
 def delete_None(values_x, values_y):
@@ -49,12 +50,42 @@ def max_abs_pearson(data, numerical_cols):
                 max_score = pearson_score
                 best_pair = (numerical_cols[i], numerical_cols[j])
 
-    print(f"\nPaire de features la plus corrélée: {best_pair[0]} et {best_pair[1]} avec un score de Pearson de {max_score:.4f}")
+    return best_pair, max_score
+
+def displayedAllPairs(data, numerical_cols, ColorsMaisons):
+    len_numerical_cols = len(numerical_cols)
+    for i in range(len_numerical_cols):
+        for j in range(i + 1, len_numerical_cols):
+            col_x = numerical_cols[i]
+            col_y = numerical_cols[j]
+
+            # calcul du score de Pearson pour la paire de features (col_x, col_y)
+            list_note_x = get_data_by_column_with_none(data, col_x)
+            list_note_y = get_data_by_column_with_none(data, col_y)
+            score = calculatePearson(list_note_x, list_note_y)
+            
+            # affichage du scatter plot pour la paire de features (col_x, col_y)
+            NotesByHouse_x, NotesByHouse_y = ListEachNotesByHouseWithTwoColumns(data, col_x, col_y)
+            fig, ax = plt.subplots(figsize=(10, 7))
+            for house, color in ColorsMaisons.items():
+                ax.scatter(NotesByHouse_x[house], NotesByHouse_y[house], alpha=0.5, label=house, color=color, s=10)
+
+            # configuration du graphique
+            ax.set_xlabel(col_x)
+            ax.set_ylabel(col_y)
+            ax.set_title(f"{col_x} vs {col_y} (Pearson={score:.4f})")
+            ax.legend()
+            ax.grid()
+            plt.tight_layout()
+            plt.show()
     
 def main():
-    if len(sys.argv) != 2:
-        print("Usage: python3 scatter_plot.py <dataset>")
+    if len(sys.argv) < 2:
+        print("Usage: python3 scatter_plot.py <dataset> [--all]")
         return
+    all = False
+    if len(sys.argv) == 3 and sys.argv[2] == "--all":
+        all = True
     header, data = read_csv(sys.argv[1])
     numerical_cols = get_numerical_columns(header)
 
@@ -65,27 +96,25 @@ def main():
         "Hufflepuff": "yellow"
     }
 
-    fig, axes = plt.subplots(4, 4, figsize=(20, 15))    # creation de 16 shema invisible
-    for j in range(len(numerical_cols), 16):
-        axes[j // 4][j % 4].set_visible(False)
+    if (all):
+        displayedAllPairs(data, numerical_cols, ColorsMaisons)
+        return
+    
+    best_pair, score = max_abs_pearson(data, numerical_cols)
+    col_x, col_y = best_pair
 
-    for i, col in enumerate(numerical_cols):            # pour chaque colone numerique, on affiche un histogramme
-        ax = axes[i // 4][i % 4]
+    NotesByHouse_x, NotesByHouse_y = ListEachNotesByHouseWithTwoColumns(data, col_x, col_y)
 
-        NotesByHouse = ListEachNotesByHouse(data, col)  # on recupere les notes de chaque maison pour la colone en cours
-        for house, color in ColorsMaisons.items():      # pour chaque maison, on affiche un histogramme de ses notes avec une couleur differente
-            values = NotesByHouse[house]
-            ax.scatter(range(len(values)), values, alpha=0.5, label=house, color=color, s=1)
-        
-        ax.set_title(col, fontsize=9)
-        ax.set_ylabel('student count')
-        ax.legend(fontsize=7)
-        ax.grid()
-
+    plt.figure(figsize=(10, 7))
+    for house, color in ColorsMaisons.items():
+        plt.scatter(NotesByHouse_x[house], NotesByHouse_y[house], alpha=0.5, label=house, color=color, s=10)
+    plt.xlabel(col_x)
+    plt.ylabel(col_y)
+    plt.title(f"Most similar features: {col_x} vs {col_y} (Pearson={score:.4f})")
+    plt.legend()
+    plt.grid()
     plt.tight_layout(pad=3.0)                           # pour eviter que les titres et les axes se chevauchent
     plt.savefig("scatter_plot.png")
-
-    max_abs_pearson(data, numerical_cols)               # on affiche la paire de features la plus corrélée selon le score de Pearson
 
 if __name__ == "__main__":
     main()

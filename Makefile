@@ -25,8 +25,14 @@ describe:
 histogram:
 	$(PYTHON) histogram.py $(DATASET_TRAIN)
 
+histogram_all:
+	$(PYTHON) histogram.py $(DATASET_TRAIN) --all
+
 scatter:
 	$(PYTHON) scatter_plot.py $(DATASET_TRAIN)
+
+scatter_all:
+	$(PYTHON) scatter_plot.py $(DATASET_TRAIN) --all
 
 pair:
 	$(PYTHON) pair_plot.py $(DATASET_TRAIN)
