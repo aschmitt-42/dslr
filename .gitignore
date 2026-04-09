@@ -10,4 +10,4 @@ __pycache__/
 *.png
 *.json
 houses.csv
-weights.json
+weights.csv
