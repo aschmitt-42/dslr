@@ -3,7 +3,7 @@ PYTHON		= $(VENV)/bin/python3
 PIP			= $(VENV)/bin/pip
 DATASET_TRAIN	= datasets/dataset_train.csv
 DATASET_TEST	= datasets/dataset_test.csv
-WEIGHTS		= weights.json
+WEIGHTS		= weights.csv
 
 # ─── Setup ────────────────────────────────────────────────────────────────────
 
