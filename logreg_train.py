@@ -1,7 +1,6 @@
 import sys
-import math
-import json
-from utils import read_csv, get_numerical_columns, GetNotesByStudents, sigmoid
+import csv
+from utils import get_columns_for_guardian, read_csv, GetNotesByStudents, sigmoid
 
 
 
@@ -66,6 +65,32 @@ def normalize(notesByStudents):
 
     return normalized, mins, maxs
 
+def denormalize_weights(weights, mins, maxs):
+    w_denorm = [0.0] * len(weights)
+    
+    # dénormaliser chaque wj
+    for j in range(len(weights) - 1):
+        w_denorm[j + 1] = weights[j + 1] / (maxs[j] - mins[j])
+    
+    # dénormaliser le biais w0
+    w_denorm[0] = weights[0]
+    for j in range(len(weights) - 1):
+        w_denorm[0] -= weights[j + 1] * mins[j] / (maxs[j] - mins[j])
+    
+    return w_denorm
+
+def save_weights(weights_by_house, filename, numerical_cols):
+    header = ["Hogwarts House", "Biais"] + numerical_cols
+    try:
+        with open(filename, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            for house, weights in weights_by_house.items():
+                row = [house] + weights
+                writer.writerow(row)
+    except Exception as e:
+        print(f"Erreur lors de l'écriture du fichier CSV : {e}")
+        exit(1)
 
 def main():
     if len(sys.argv) != 2:
@@ -73,7 +98,7 @@ def main():
         return
 
     header, data = read_csv(sys.argv[1])
-    numerical_cols = get_numerical_columns(header)
+    numerical_cols = get_columns_for_guardian()
     notesByStudents = GetNotesByStudents(data, numerical_cols) # Chaque element de la liste correspond a un etudiant et contient la liste de ses notes
     
     # normalisation des notes entre 0 et 1, évite que certaines features dominent et accélère la convergence du modèle
@@ -87,26 +112,16 @@ def main():
         labels = get_labels(data, house)            # labels indique si etudiant appartient a la maison
         for _ in range(500):                        # Entraînement du modèle de régression logistique
             weights = GradientDescent(normalizedNotes, labels, weights, learning_rate=0.1)
+        weights = denormalize_weights(weights, mins, maxs)
         weights_by_house[house] = weights
 
         # # Calacul de l'accuracy du modèle pour chaque maison 
-        # predictions = predict(normalizedNotes, weights)
+        # predictions = predict(notesByStudents, weights)
         # correct = sum(1 for p, l in zip(predictions, labels) if (p >= 0.5) == l)
         # accuracy = correct / len(labels) * 100
         # print(f"{house}: {accuracy:.2f}%")
 
-    model = { "weights": weights_by_house, "min": mins, "max": maxs }
-    try:
-        with open(f"weights.json", "w", encoding="utf-8") as f:
-            json.dump(model, f, indent=2)
-    except Exception as e:
-        print(f"Probleme avec le json : {e}")
-        exit(1)
-        
-        
-
-
-  
+    save_weights(weights_by_house, "weights.csv", numerical_cols)
     
 
 if __name__ == "__main__":
