@@ -27,6 +27,10 @@ def get_numerical_columns(header):
     
     return numerical_cols
 
+def get_columns_for_guardian():
+    return  ["Astronomy", "Herbology", "Defense Against the Dark Arts", 
+                "Ancient Runes", "Charms", "Divination", "Muggle Studies", "History of Magic", "Potions", "Flying"]
+
 def get_data_by_column(data, col_name):
     values = []
     
