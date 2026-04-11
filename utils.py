@@ -27,7 +27,7 @@ def get_numerical_columns(header):
     
     return numerical_cols
 
-def get_columns_for_guardian():
+def get_columns_for_gradient():
     return  ["Astronomy", "Herbology", "Defense Against the Dark Arts", 
                 "Ancient Runes", "Charms", "Divination", "Muggle Studies", "History of Magic", "Potions", "Flying"]
 

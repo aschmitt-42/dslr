@@ -1,22 +1,7 @@
 import sys
 import csv
 from logreg_train import GetNotesByStudents
-from utils import get_columns_for_guardian, read_csv, sigmoid
-
-
-def normalizeNotes(notesByStudents, mins, maxs):
-    nb_students = len(notesByStudents)
-    nb_features = len(notesByStudents[0])
-    normalized  = [[] for _ in range(nb_students)]
-
-    for i in range(nb_features):
-        for j in range(nb_students):
-            if mins[i] != maxs[i]:
-                normalized[j].append((notesByStudents[j][i] - mins[i]) / (maxs[i] - mins[i]))
-            else:
-                normalized[j].append(0)
-
-    return normalized
+from utils import get_columns_for_gradient, read_csv, sigmoid
 
 def load_weights(filename):
     try:
@@ -26,7 +11,7 @@ def load_weights(filename):
             for row in reader:
                 house = row["Hogwarts House"]
                 weights = [float(row["Biais"])]
-                for col in get_columns_for_guardian():
+                for col in get_columns_for_gradient():
                     weights.append(float(row[col]))
                 weights_by_house[house] = weights
         return weights_by_house
@@ -41,7 +26,7 @@ def main():
 
     weights_by_house = load_weights(sys.argv[2])
     header, data = read_csv(sys.argv[1])
-    numerical_cols = get_columns_for_guardian()
+    numerical_cols = get_columns_for_gradient()
     notesByStudents = GetNotesByStudents(data, numerical_cols) # Chaque element de la liste correspond a un etudiant et contient la liste de ses notes
     
     

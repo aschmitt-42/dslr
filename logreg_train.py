@@ -1,6 +1,7 @@
 import sys
 import csv
-from utils import read_csv, get_numerical_columns, GetNotesByStudents, sigmoid
+from sklearn.metrics import accuracy_score
+from utils import read_csv, get_columns_for_gradient, GetNotesByStudents, sigmoid
 from bonus import (
     stochastic_gradient_descent,
     calculate_r2_score,
@@ -101,7 +102,12 @@ def display_metrics(house, labels, predictions):
     rmse = calculate_rmse(labels, predictions)
     mae = calculate_mae(labels, predictions)
     mape = calculate_mape(labels, predictions)
-    print(f"{house}: R² Score = {r2:.4f}, RMSE = {rmse:.4f}, MAE = {mae:.4f}, MAPE = {mape:.4f}%")
+    
+    # Convert predictions to binary (0 or 1) for accuracy score
+    binary_predictions = [1 if p >= 0.5 else 0 for p in predictions]
+    accuracy = accuracy_score(labels, binary_predictions)
+    
+    print(f"{house}: Accuracy = {accuracy:.4f}, R² Score = {r2:.4f}, RMSE = {rmse:.4f}, MAE = {mae:.4f}, MAPE = {mape:.4f}%")
 
 
 def main():
@@ -114,7 +120,7 @@ def main():
         exit(1)
 
     header, data = read_csv(sys.argv[1])
-    numerical_cols = get_numerical_columns(header)
+    numerical_cols = get_columns_for_gradient()
 
     notesByStudents = GetNotesByStudents(data, numerical_cols)
     normalizedNotes, mins, maxs = normalize(notesByStudents)
