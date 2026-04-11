@@ -44,6 +44,9 @@ visu: histogram scatter pair
 train:
 	$(PYTHON) logreg_train.py $(DATASET_TRAIN)
 
+stochastic:
+	$(PYTHON) logreg_train.py $(DATASET_TRAIN) --bonus
+
 predict:
 	$(PYTHON) logreg_predict.py $(DATASET_TEST) $(WEIGHTS)
 
