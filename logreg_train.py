@@ -1,5 +1,5 @@
 import sys
-import json
+import csv
 from utils import read_csv, get_numerical_columns, GetNotesByStudents, sigmoid
 from bonus import (
     stochastic_gradient_descent,
@@ -86,9 +86,40 @@ def denormalize_weights(weights, mins, maxs):
 
     return w_denorm
 
+def save_weights(weights_by_house, filename, numerical_cols):
+    header = ["Hogwarts House", "Biais"] + numerical_cols
+    try:
+        with open(filename, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerow(header)
+            for house, weights in weights_by_house.items():
+                row = [house] + weights
+                writer.writerow(row)
+    except Exception as e:
+        print(f"Erreur lors de l'écriture du fichier CSV : {e}")
+        exit(1)
 
 def display_metrics(house, labels, predictions):
+    r2 = calculate_r2_score(labels, predictions)
+    rmse = calculate_rmse(labels, predictions)
+    mae = calculate_mae(labels, predictions)
+    mape = calculate_mape(labels, predictions)
+    print(f"{house}: R² Score = {r2:.4f}, RMSE = {rmse:.4f}, MAE = {mae:.4f}, MAPE = {mape:.4f}%")
+
+
+def main():
+    use_sgd = False
+    if len(sys.argv) > 2 and sys.argv[2] == "--bonus":
+        use_sgd = True
     
+    if len(sys.argv) < 2:
+        print("Usage: python3 logreg_train.py <dataset.csv> [--bonus]")
+        exit(1)
+
+    header, data = read_csv(sys.argv[1])
+    numerical_cols = get_numerical_columns(header)
+
+    notesByStudents = GetNotesByStudents(data, numerical_cols)
     normalizedNotes, mins, maxs = normalize(notesByStudents)
 
     houses = ['Gryffindor', 'Hufflepuff', 'Ravenclaw', 'Slytherin']
@@ -109,18 +140,12 @@ def display_metrics(house, labels, predictions):
                     normalizedNotes, labels, weights,
                     learning_rate=0.1)
 
-        weights_by_house[house] = weights
 
         predictions = predict(normalizedNotes, weights)
         display_metrics(house, labels, predictions)
-
-    model = {"weights": weights_by_house, "min": mins, "max": maxs}
-    try:
-        with open("weights.json", "w", encoding="utf-8") as f:
-            json.dump(model, f, indent=2)
-    except Exception as e:
-        print(f"Probleme avec le json : {e}")
-        exit(1)
+        weights_denorm = denormalize_weights(weights, mins, maxs)
+        weights_by_house[house] = weights_denorm
+        save_weights(weights_by_house, "weights.csv", numerical_cols)   
 
 
 if __name__ == "__main__":
