@@ -9,8 +9,6 @@ from bonus import (
     calculate_mape
 )
 
-
-
 def predict(notesByStudents, weights):
     probabilities = []
     for student in notesByStudents:
@@ -27,9 +25,8 @@ def GradientDescent(notesByStudents, labels, weights, learning_rate=0.1):
     probabilities = predict(notesByStudents, weights)
     errors = [probabilities[i] - labels[i] for i in range(nb_students)] # erreur entre la probabilité prédite et le label réel pour chaque étudiant
 
-    # mise à jour les poids pour réduire les erreurs
     temp_wj = [0.0] * (len(weights) - 1)
-    temp_w0 = sum(errors) / nb_students # le biais moyenne des erreurs
+    temp_w0 = sum(errors) / nb_students
 
     for j in range(len(weights) - 1):
         for i in range(nb_students):
