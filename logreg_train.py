@@ -140,15 +140,13 @@ def main():
         labels = get_labels(data, house)
 
         if use_sgd:
-            for _ in range(500):
-                weights = stochastic_gradient_descent(
-                    normalizedNotes, labels, weights,
-                    learning_rate=0.1, epochs=1)
+            weights = stochastic_gradient_descent(
+                normalizedNotes, labels, weights,
+                learning_rate=0.1, epochs=500)
         elif use_mini_batch:
-            for _ in range(500):
                 weights = mini_batch_gradient_descent(
                     normalizedNotes, labels, weights,
-                    batch_size=32, learning_rate=0.1, epochs=1)
+                    batch_size=32, learning_rate=0.1, epochs=500)
         else:
             for _ in range(500):
                 weights = GradientDescent(

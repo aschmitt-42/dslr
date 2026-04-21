@@ -19,11 +19,10 @@ def ListEachNotesByHouseWithTwoColumns(data, col_name1, col_name2):
 
 def histo(data, col_name, ColorsMaisons, ax):
     NotesByHouse = ListEachNotesByHouse(data, col_name)  # on recupere les notes de chaque maison pour la colone en cours
-    for house, color in ColorsMaisons.items():              # pour chaque maison, on affiche un histogramme de ses notes avec une couleur differente
+    for house, color in ColorsMaisons.items():          # pour chaque maison, on affiche un histogramme de ses notes avec une couleur differente
         values = NotesByHouse[house]
         ax.hist(values, bins=20, alpha=0.5, label=house, color=color)
     
-    # ax.legend(fontsize=7)
     ax.grid()
 
 def main():
@@ -40,12 +39,12 @@ def main():
         "Hufflepuff": "yellow"
     }
     len_numerical_cols = len(numerical_cols)
-    fig, axes = plt.subplots(len_numerical_cols, len_numerical_cols, figsize=(20, 15))    # creation de 16 shema invisible
+    fig, axes = plt.subplots(len_numerical_cols, len_numerical_cols, figsize=(20, 15))
 
     for i in range(len_numerical_cols):
         for j in range(len_numerical_cols):
             if (i < j):
-                axes[i][j].set_visible(False)  # on rend les shemas en dessous de la diagonale invisibles
+                axes[i][j].set_visible(False)
                 continue
             ax = axes[i][j]
             ax.set_xticks([])
@@ -66,8 +65,7 @@ def main():
 
             ax.grid()
 
-    plt.tight_layout(pad=1.5)                           # pour eviter que les titres et les axes se chevauchent
-    # plt.show()
+    plt.tight_layout(pad=1.5)
     plt.savefig("pair_plot.png")
 
 

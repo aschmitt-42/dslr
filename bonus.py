@@ -3,7 +3,7 @@ import random
 from utils import sigmoid
 
 
-def stochastic_gradient_descent(notesByStudents, labels, weights, learning_rate=0.1, epochs=500):
+def stochastic_gradient_descent(notesByStudents, labels, weights, learning_rate, epochs):
     nb_students = len(notesByStudents)
     
     for epoch in range(epochs):
@@ -27,7 +27,7 @@ def stochastic_gradient_descent(notesByStudents, labels, weights, learning_rate=
     return weights
 
 
-def mini_batch_gradient_descent(notesByStudents, labels, weights, batch_size=32, learning_rate=0.1, epochs=500):
+def mini_batch_gradient_descent(notesByStudents, labels, weights, batch_size, learning_rate, epochs):
     """
     Mini-Batch Gradient Descent : compromise entre BGD et SGD.
     Traite des petits groupes de samples à la fois.
