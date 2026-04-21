@@ -4,6 +4,7 @@ from sklearn.metrics import accuracy_score
 from utils import read_csv, get_columns_for_gradient, GetNotesByStudents, sigmoid
 from bonus import (
     stochastic_gradient_descent,
+    mini_batch_gradient_descent,
     calculate_r2_score,
     calculate_rmse,
     calculate_mae,
@@ -105,18 +106,24 @@ def display_metrics(house, labels, predictions):
     
     # Convert predictions to binary (0 or 1) for accuracy score
     binary_predictions = [1 if p >= 0.5 else 0 for p in predictions]
-    accuracy = accuracy_score(labels, binary_predictions)
+    accuracy = accuracy_score(labels, binary_predictions) * 100
     
-    print(f"{house}: Accuracy = {accuracy:.4f}, R² Score = {r2:.4f}, RMSE = {rmse:.4f}, MAE = {mae:.4f}, MAPE = {mape:.4f}%")
+    print(f"{house}: Accuracy = {accuracy:.4f}%, R² Score = {r2:.4f}, RMSE = {rmse:.4f}, MAE = {mae:.4f}, MAPE = {mape:.4f}%")
 
 
 def main():
     use_sgd = False
-    if len(sys.argv) > 2 and sys.argv[2] == "--bonus":
-        use_sgd = True
+    use_mini_batch = False
     
-    if len(sys.argv) < 2:
-        print("Usage: python3 logreg_train.py <dataset.csv> [--bonus]")
+    if len(sys.argv) < 2 or len(sys.argv) > 3:
+        print("Usage: python3 logreg_train.py <dataset.csv> [--stochastic | --mini-batch]")
+        exit(1)
+    if len(sys.argv) > 2 and sys.argv[2] == "--stochastic":
+        use_sgd = True
+    elif len(sys.argv) > 2 and sys.argv[2] == "--mini-batch":
+        use_mini_batch = True
+    else:
+        print("Usage: python3 logreg_train.py <dataset.csv> [--stochastic | --mini-batch]")
         exit(1)
 
     header, data = read_csv(sys.argv[1])
@@ -137,6 +144,11 @@ def main():
                 weights = stochastic_gradient_descent(
                     normalizedNotes, labels, weights,
                     learning_rate=0.1, epochs=1)
+        elif use_mini_batch:
+            for _ in range(500):
+                weights = mini_batch_gradient_descent(
+                    normalizedNotes, labels, weights,
+                    batch_size=32, learning_rate=0.1, epochs=1)
         else:
             for _ in range(500):
                 weights = GradientDescent(

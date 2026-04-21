@@ -81,6 +81,21 @@ python3 describe.py datasets/dataset_train.csv
 - Mean, Std, Min, Max
 - 25%, 50%, 75% (quartiles)
 
+#### 1b. Afficher les statistiques enrichies (BONUS)
+
+```bash
+python3 describe.py datasets/dataset_train.csv --bonus
+```
+
+**Statistiques bonus ajoutées** :
+- **Variance** : Dispersion des données = (σ²)
+- **Skewness** : Asymétrie de la distribution (-1 à 1)
+  - Positive = queue à droite (plus de petites valeurs)
+  - Négative = queue à gauche (plus de grandes valeurs)
+- **Kurtosis** : Poids des queues (données extrêmes)
+  - Positif = queues lourdes (beaucoup de valeurs extrêmes)
+  - Négatif = queues légères (peu de valeurs extrêmes)
+
 ### 2. Entraîner le modèle - Gradient Descent classique
 
 ```bash
@@ -103,7 +118,19 @@ python3 logreg_train.py datasets/dataset_train.csv --bonus
 - Généralement des métriques **meilleures**
 - Crée `weights.json` (écrase le précédent)
 
-### 4. Prédire les maisons pour de nouveaux étudiants
+### 4. Entraîner le modèle - Mini-Batch Gradient Descent (BONUS)
+
+```bash
+python3 logreg_train.py datasets/dataset_train.csv --mini-batch
+```
+
+**Résultat** :
+- Utilise Mini-Batch GD (compromise entre GD et SGD)
+- Traite des petits groupes de 32 étudiants par itération
+- Plus stable que SGD, plus rapide que GD classique
+- Convient particulièrement aux gros datasets
+
+### 5. Prédire les maisons pour de nouveaux étudiants
 
 ```bash
 python3 logreg_predict.py datasets/dataset_test.csv weights.json
@@ -111,7 +138,7 @@ python3 logreg_predict.py datasets/dataset_test.csv weights.json
 
 **Résultat** : Crée `houses.csv` avec les prédictions de maisons
 
-### 5. Consulter les explications détaillées
+### 6. Consulter les explications détaillées
 
 ```bash
 cat explication.md  # Ou ouvrir dans votre éditeur
@@ -179,6 +206,36 @@ Variante du GD qui met à jour les poids avec **chaque étudiant** au lieu de to
 - Convient mieux aux gros datasets
 
 **Résultats observés** : SGD donne des métriques ~10% meilleures
+
+### Mini-Batch Gradient Descent (MBGD)
+
+Compromise optimal entre **GD classique** et **SGD**. Met à jour les poids avec des petits groupes d'étudiants.
+
+**Différences** :
+- **GD** : 1 mise à jour par test (avec tous les 1600 étudiants) → très lisse mais lent
+- **SGD** : 1600 mises à jour par test (1 par étudiant) → rapide mais bruyant
+- **MBGD** : ~50 mises à jour par test (groupes de 32) → 🎯 **Balance idéale**
+
+**Formule** :
+$$\nabla = \frac{1}{B} \sum_{i \in \text{batch}} (\text{pred}_i - y_i) \times x_i$$
+
+Où B = taille du batch (défaut: 32)
+
+**Avantages du Mini-Batch** :
+- ✓ Calcul stable (moins bruyant que SGD)
+- ✓ Convergence plus rapide (que GD classique)
+- ✓ Parallelisable (idéal pour GPU)
+- ✓ Convient aux datasets intermédiaires
+
+**Comparaison** :
+
+| Critère | BGD | MBGD | SGD |
+|---------|-----|------|-----|
+| Stabilité | ⭐⭐⭐ | ⭐⭐ | ⭐ |
+| Vitesse | ⭐ | ⭐⭐ | ⭐⭐⭐ |
+| Mémoire | ❌ Haute | ✓ Modérée | ✓ Basse |
+| Parallelisable | ❌ | ✓ | ✓ |
+| **Recommandé** | Petits datasets | **Recommandé** | Gros temps-réel |
 
 ### Normalisation des données
 
@@ -271,6 +328,9 @@ Fonctions utilitaires réutilisables :
 - `calculateMean()`, `calculateStandardDeviation()` : Statistiques
 - `findMin()`, `findMax()` : Extrema
 - `calculatePercentile()` : Quartiles
+- `calculate_variance()` : Variance (dispersion)
+- `calculate_skewness()` : Asymétrie de la distribution
+- `calculate_kurtosis()` : Poids des valeurs extrêmes
 - `GetNotesByStudents()` : Prépare les données (remplace les NaN par moyennes)
 - `sigmoid()` : Fonction d'activation
 
@@ -280,6 +340,7 @@ Implémentations bonus pour améliorer le modèle.
 
 **Contient** :
 - `stochastic_gradient_descent()` : SGD
+- `mini_batch_gradient_descent()` : Mini-Batch GD (compromise optimal)
 - `calculate_r2_score()` : R² Score
 - `calculate_rmse()` : RMSE
 - `calculate_mae()` : MAE

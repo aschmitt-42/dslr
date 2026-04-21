@@ -20,6 +20,9 @@ $(VENV): requirements.txt
 describe:
 	$(PYTHON) describe.py $(DATASET_TRAIN)
 
+describe_all:
+	$(PYTHON) describe.py $(DATASET_TRAIN) --bonus
+
 # ─── Étape 2 : Data Visualization ────────────────────────────────────────────
 
 histogram:
@@ -45,7 +48,10 @@ train:
 	$(PYTHON) logreg_train.py $(DATASET_TRAIN)
 
 stochastic:
-	$(PYTHON) logreg_train.py $(DATASET_TRAIN) --bonus
+	$(PYTHON) logreg_train.py $(DATASET_TRAIN) --stochastic
+
+mini-batch:
+	$(PYTHON) logreg_train.py $(DATASET_TRAIN) --mini-batch
 
 predict:
 	$(PYTHON) logreg_predict.py $(DATASET_TEST) $(WEIGHTS)

@@ -1,5 +1,5 @@
 import sys
-from utils import read_csv, get_data_by_column, get_numerical_columns, calculateMean, calculateStandardDeviation, ListEachNotesByHouse
+from utils import read_csv, get_numerical_columns, calculateMean, calculateStandardDeviation, ListEachNotesByHouse
 
 import matplotlib.pyplot as plt
 
@@ -35,7 +35,7 @@ def displayedAll(data, numerical_cols, ColorsMaisons):
         ax.legend(fontsize=7)
         ax.grid()
         plt.tight_layout(pad=3.0)    
-    plt.show()
+    plt.savefig("histograms_all.png")
 
 
 def displayedBest(data, numerical_cols, ColorsMaisons):

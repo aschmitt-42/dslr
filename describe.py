@@ -7,7 +7,10 @@ from utils import (
     calculateStandardDeviation,
     findMin,
     findMax,
-    calculatePercentile
+    calculatePercentile,
+    calculate_variance,
+    calculate_skewness,
+    calculate_kurtosis
 )
 
 
@@ -24,7 +27,7 @@ def get_count(data, col_name):
     return count
 
 
-def describe_column(data, col_name):
+def describe_column(data, col_name, show_bonus=False):
     #Calcule tous les statistiques pour une colonne
     values = get_data_by_column(data, col_name)
     
@@ -41,7 +44,7 @@ def describe_column(data, col_name):
     percentile_75 = calculatePercentile(values, 75)
     count = get_count(data, col_name)
     
-    return {
+    stats = {
         'Count': count,
         'Mean': mean,
         'Std': std,
@@ -51,18 +54,31 @@ def describe_column(data, col_name):
         '75%': percentile_75,
         'Max': max_val,
     }
+    
+    # Ajoute les stats bonus si --bonus est présent
+    if show_bonus:
+        variance = calculate_variance(values)
+        skewness = calculate_skewness(values)
+        kurtosis = calculate_kurtosis(values)
+        stats['Variance'] = variance
+        stats['Skewness'] = skewness
+        stats['Kurtosis'] = kurtosis
+    
+    return stats
 
 
-def print_table(data, numerical_cols):
+def print_table(data, numerical_cols, show_bonus=False):
     #Affiche les statistiques sous forme de tableau
     
     # Collecte les statistiques pour chaque colonne
     stats_by_col = {}
     for col in numerical_cols:
-        stats_by_col[col] = describe_column(data, col)
+        stats_by_col[col] = describe_column(data, col, show_bonus)
     
     # Définit l'ordre des statistiques
     stat_names = ['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max']
+    if show_bonus:
+        stat_names.extend(['Variance', 'Skewness', 'Kurtosis'])
     
     # Calcule la largeur optimale pour chaque colonne
     col_widths = {}
@@ -87,7 +103,7 @@ def print_table(data, numerical_cols):
         print(f"{stat:<{label_width}}", end='')
         for col in numerical_cols:
             if stats_by_col[col] is not None:
-                value = stats_by_col[col][stat]
+                value = stats_by_col[col].get(stat)
                 if value is not None:
                     print(f"{value:>{col_widths[col]}.6f}", end='')
                 else:
@@ -98,8 +114,15 @@ def print_table(data, numerical_cols):
 
 
 def main():
+    show_bonus = False
+    
+    # Vérifie si --bonus est présent
+    if "--bonus" in sys.argv:
+        show_bonus = True
+        sys.argv.remove("--bonus")
+    
     if len(sys.argv) != 2:
-        print("Usage: python3 describe.py <dataset>")
+        print("Usage: python3 describe.py <dataset> [--bonus]")
         return
 
     header, data = read_csv(sys.argv[1])
@@ -113,7 +136,7 @@ def main():
         print("Aucune colonne numérique trouvée dans le dataset")
         return
     
-    print_table(data, numerical_cols)
+    print_table(data, numerical_cols, show_bonus)
 
 
 if __name__ == "__main__":
