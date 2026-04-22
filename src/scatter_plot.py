@@ -1,7 +1,7 @@
 import sys
 import matplotlib.pyplot as plt
 from pair_plot import ListEachNotesByHouseWithTwoColumns
-from utils import read_csv, get_data_by_column, get_numerical_columns, calculateMean, calculateStandardDeviation, ListEachNotesByHouse, get_data_by_column_with_none
+from utils import read_csv, get_numerical_columns, calculateMean, calculateStandardDeviation, ListEachNotesByHouse, get_data_by_column_with_none
 
 def delete_None(values_x, values_y):
     new_values_x = []

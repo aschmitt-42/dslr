@@ -1,6 +1,6 @@
 import math
 import random
-from utils import sigmoid
+from utils import sigmoid, calculateMean
 
 
 def stochastic_gradient_descent(notesByStudents, labels, weights, learning_rate, epochs):

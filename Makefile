@@ -66,4 +66,4 @@ fclean: clean
 
 re: fclean all
 
-.PHONY: all describe histogram scatter pair visu train predict clean fclean re
+.PHONY: all describe histogram scatter pair visu train predict clean fclean re mini-batch stochastic describe_all output
