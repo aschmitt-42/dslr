@@ -1,6 +1,5 @@
 import sys
 import csv
-from sklearn.metrics import accuracy_score
 from utils import read_csv, get_columns_for_gradient, GetNotesByStudents, sigmoid
 from bonus import (
     stochastic_gradient_descent,
