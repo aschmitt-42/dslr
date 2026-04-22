@@ -7,7 +7,9 @@ from utils import (
     calculateStandardDeviation,
     findMin,
     findMax,
-    calculatePercentile,
+    calculatePercentile
+)
+from bonus import (
     calculate_variance,
     calculate_skewness,
     calculate_kurtosis
@@ -15,7 +17,6 @@ from utils import (
 
 
 def get_count(data, col_name):
-    #Compte le nombre de valeurs non-vides pour une colonne
     count = 0
     for val in data[col_name]:
         if val != '' and val is not None:
@@ -28,7 +29,6 @@ def get_count(data, col_name):
 
 
 def describe_column(data, col_name, show_bonus=False):
-    #Calcule tous les statistiques pour une colonne
     values = get_data_by_column(data, col_name)
     
     if len(values) == 0:
@@ -55,7 +55,6 @@ def describe_column(data, col_name, show_bonus=False):
         'Max': max_val,
     }
     
-    # Ajoute les stats bonus si --bonus est présent
     if show_bonus:
         variance = calculate_variance(values)
         skewness = calculate_skewness(values)
@@ -68,37 +67,27 @@ def describe_column(data, col_name, show_bonus=False):
 
 
 def print_table(data, numerical_cols, show_bonus=False):
-    #Affiche les statistiques sous forme de tableau
-    
-    # Collecte les statistiques pour chaque colonne
     stats_by_col = {}
     for col in numerical_cols:
         stats_by_col[col] = describe_column(data, col, show_bonus)
     
-    # Définit l'ordre des statistiques
     stat_names = ['Count', 'Mean', 'Std', 'Min', '25%', '50%', '75%', 'Max']
     if show_bonus:
         stat_names.extend(['Variance', 'Skewness', 'Kurtosis'])
     
-    # Calcule la largeur optimale pour chaque colonne
     col_widths = {}
     for col in numerical_cols:
-        # Commence avec la largeur du nom de la colonne
         width = len(col) + 2
-        # Vérifie que c'est assez pour les nombres (14 caractères pour "1234567.890123")
         width = max(width, 14)
         col_widths[col] = width
-    
-    # Largeur pour la colonne des labels (statistiques)
+
     label_width = 10
-    
-    # Affiche l'en-tête (noms des colonnes)
+
     print(f"{'':<{label_width}}", end='')
     for col in numerical_cols:
         print(f"{col:>{col_widths[col]}}", end='')
     print()
     
-    # Affiche chaque ligne de statistiques
     for stat in stat_names:
         print(f"{stat:<{label_width}}", end='')
         for col in numerical_cols:
@@ -116,7 +105,6 @@ def print_table(data, numerical_cols, show_bonus=False):
 def main():
     show_bonus = False
     
-    # Vérifie si --bonus est présent
     if "--bonus" in sys.argv:
         show_bonus = True
         sys.argv.remove("--bonus")

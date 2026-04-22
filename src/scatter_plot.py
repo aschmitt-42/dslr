@@ -114,7 +114,7 @@ def main():
     plt.legend()
     plt.grid()
     plt.tight_layout(pad=3.0)                           # pour eviter que les titres et les axes se chevauchent
-    plt.savefig("scatter_plot.png")
+    plt.savefig("output/scatter_plot.png")
 
 if __name__ == "__main__":
     main()

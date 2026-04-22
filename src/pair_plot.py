@@ -68,7 +68,7 @@ def main():
 
     plt.tight_layout(pad=1.5)                           # pour eviter que les titres et les axes se chevauchent
     # plt.show()
-    plt.savefig("pair_plot.png")
+    plt.savefig("output/pair_plot.png")
 
 
 if __name__ == "__main__":

@@ -42,7 +42,7 @@ def main():
         predicted_house = max(scores, key=scores.get)
         predicted_houses.append(predicted_house)
 
-    with open("houses.csv", "w", newline="", encoding="utf-8") as f:
+    with open("output/houses.csv", "w", newline="", encoding="utf-8") as f:
         writer = csv.writer(f)
         writer.writerow(["Index", "Hogwarts House"])
         for i, house in enumerate(predicted_houses):

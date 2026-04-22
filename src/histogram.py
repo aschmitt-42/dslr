@@ -35,7 +35,7 @@ def displayedAll(data, numerical_cols, ColorsMaisons):
         ax.legend(fontsize=7)
         ax.grid()
         plt.tight_layout(pad=3.0)    
-    plt.savefig("histograms_all.png")
+    plt.savefig("output/histograms_all.png")
 
 
 def displayedBest(data, numerical_cols, ColorsMaisons):
@@ -57,7 +57,7 @@ def displayedBest(data, numerical_cols, ColorsMaisons):
     plt.title(f"Most homogenous: {best} (Pearson={homogenity_scores[best]:.4f})")
 
     plt.tight_layout(pad=3.0)                           # pour eviter que les titres et les axes se chevauchent
-    plt.savefig("histogram.png")
+    plt.savefig("output/histogram.png")
 
 
 def main():

@@ -3,7 +3,7 @@ import random
 from utils import sigmoid
 
 
-def stochastic_gradient_descent(notesByStudents, labels, weights, learning_rate=0.1, epochs=500):
+def stochastic_gradient_descent(notesByStudents, labels, weights, learning_rate, epochs):
     nb_students = len(notesByStudents)
     
     for epoch in range(epochs):
@@ -27,25 +27,9 @@ def stochastic_gradient_descent(notesByStudents, labels, weights, learning_rate=
     return weights
 
 
-def mini_batch_gradient_descent(notesByStudents, labels, weights, batch_size=32, learning_rate=0.1, epochs=500):
-    """
-    Mini-Batch Gradient Descent : compromise entre BGD et SGD.
-    Traite des petits groupes de samples à la fois.
-    
-    Args:
-        notesByStudents: Liste de listes (features pour chaque étudiant)
-        labels: Liste de labels (0 ou 1)
-        weights: Poids du modèle [biais, w1, w2, ..., wn]
-        batch_size: Taille des mini-batches (défaut: 32)
-        learning_rate: Taux d'apprentissage (défaut: 0.1)
-        epochs: Nombre d'epochs (défaut: 500)
-    
-    Returns:
-        weights: Poids mis à jour après l'entraînement
-    """
+def mini_batch_gradient_descent(notesByStudents, labels, weights, batch_size, learning_rate, epochs):
     nb_students = len(notesByStudents)
     
-    # Ajuste batch_size si plus grand que le dataset
     if batch_size > nb_students:
         batch_size = nb_students
     
@@ -56,7 +40,6 @@ def mini_batch_gradient_descent(notesByStudents, labels, weights, batch_size=32,
             j = int(random.random() * (i + 1))
             indices[i], indices[j] = indices[j], indices[i]
         
-        # Traite par batches
         for batch_start in range(0, nb_students, batch_size):
             batch_end = min(batch_start + batch_size, nb_students)
             batch_indices = indices[batch_start:batch_end]
@@ -83,7 +66,6 @@ def mini_batch_gradient_descent(notesByStudents, labels, weights, batch_size=32,
             for j in range(len(gradient_wj)):
                 gradient_wj[j] /= batch_size_actual
             
-            # Mise à jour des poids
             weights[0] -= learning_rate * gradient_w0
             for j in range(len(weights) - 1):
                 weights[j + 1] -= learning_rate * gradient_wj[j]
@@ -135,3 +117,38 @@ def calculate_mape(y_true, y_pred):
     
     return (total_error / count) * 100
 
+
+def calculate_variance(values):
+    if len(values) == 0:
+        return None
+    mean = calculateMean(values)
+    if mean is None:
+        return None
+    variance = sum((x - mean) ** 2 for x in values) / len(values)
+    return variance
+
+
+def calculate_skewness(values):
+    if len(values) < 2:
+        return None
+    mean = calculateMean(values)
+    variance = calculate_variance(values)
+    if mean is None or variance is None or variance == 0:
+        return 0.0
+    std = math.sqrt(variance)
+    third_moment = sum((x - mean) ** 3 for x in values) / len(values)
+    skewness = third_moment / (std ** 3)
+    return skewness
+
+
+def calculate_kurtosis(values):
+    if len(values) < 4:
+        return None
+    mean = calculateMean(values)
+    variance = calculate_variance(values)
+    if mean is None or variance is None or variance == 0:
+        return 0.0
+    std = math.sqrt(variance)
+    fourth_moment = sum((x - mean) ** 4 for x in values) / len(values)
+    kurtosis_excess = (fourth_moment / (std ** 4)) - 3
+    return kurtosis_excess 
