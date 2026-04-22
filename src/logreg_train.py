@@ -5,10 +5,6 @@ from utils import read_csv, get_columns_for_gradient, GetNotesByStudents, sigmoi
 from bonus import (
     stochastic_gradient_descent,
     mini_batch_gradient_descent,
-    calculate_r2_score,
-    calculate_rmse,
-    calculate_mae,
-    calculate_mape
 )
 
 def predict(notesByStudents, weights):
@@ -100,17 +96,6 @@ def save_weights(weights_by_house, filename, numerical_cols):
         print(f"Erreur lors de l'écriture du fichier CSV : {e}")
         exit(1)
 
-def display_metrics(house, labels, predictions):
-    r2 = calculate_r2_score(labels, predictions)
-    rmse = calculate_rmse(labels, predictions)
-    mae = calculate_mae(labels, predictions)
-    mape = calculate_mape(labels, predictions)
-
-    binary_predictions = [1 if p >= 0.5 else 0 for p in predictions]
-    accuracy = accuracy_score(labels, binary_predictions) * 100 
-    
-    print(f"{house}: Accuracy = {accuracy:.4f}%, R² Score = {r2:.4f}, RMSE = {rmse:.4f}, MAE = {mae:.4f}, MAPE = {mape:.4f}%")
-
 
 def main():
     use_sgd = False
@@ -157,7 +142,6 @@ def main():
 
 
         predictions = predict(normalizedNotes, weights)
-        display_metrics(house, labels, predictions)
         weights_denorm = denormalize_weights(weights, mins, maxs)
         weights_by_house[house] = weights_denorm
         save_weights(weights_by_house, "output/weights.csv", numerical_cols)   

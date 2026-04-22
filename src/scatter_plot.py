@@ -51,41 +51,12 @@ def max_abs_pearson(data, numerical_cols):
                 best_pair = (numerical_cols[i], numerical_cols[j])
 
     return best_pair, max_score
-
-def displayedAllPairs(data, numerical_cols, ColorsMaisons):
-    len_numerical_cols = len(numerical_cols)
-    for i in range(len_numerical_cols):
-        for j in range(i + 1, len_numerical_cols):
-            col_x = numerical_cols[i]
-            col_y = numerical_cols[j]
-
-            # calcul du score de Pearson pour la paire de features (col_x, col_y)
-            list_note_x = get_data_by_column_with_none(data, col_x)
-            list_note_y = get_data_by_column_with_none(data, col_y)
-            score = calculatePearson(list_note_x, list_note_y)
-            
-            # affichage du scatter plot pour la paire de features (col_x, col_y)
-            NotesByHouse_x, NotesByHouse_y = ListEachNotesByHouseWithTwoColumns(data, col_x, col_y)
-            fig, ax = plt.subplots(figsize=(10, 7))
-            for house, color in ColorsMaisons.items():
-                ax.scatter(NotesByHouse_x[house], NotesByHouse_y[house], alpha=0.5, label=house, color=color, s=10)
-
-            # configuration du graphique
-            ax.set_xlabel(col_x)
-            ax.set_ylabel(col_y)
-            ax.set_title(f"{col_x} vs {col_y} (Pearson={score:.4f})")
-            ax.legend()
-            ax.grid()
-            plt.tight_layout()
-            plt.show()
     
 def main():
-    if len(sys.argv) < 2:
+    if len(sys.argv) != 2:
         print("Usage: python3 scatter_plot.py <dataset> [--all]")
         return
-    all = False
-    if len(sys.argv) == 3 and sys.argv[2] == "--all":
-        all = True
+
     header, data = read_csv(sys.argv[1])
     numerical_cols = get_numerical_columns(header)
 
@@ -95,10 +66,6 @@ def main():
         "Gryffindor": "red",
         "Hufflepuff": "yellow"
     }
-
-    if (all):
-        displayedAllPairs(data, numerical_cols, ColorsMaisons)
-        return
     
     best_pair, score = max_abs_pearson(data, numerical_cols)
     col_x, col_y = best_pair

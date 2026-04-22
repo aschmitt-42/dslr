@@ -32,15 +32,9 @@ describe_all:
 histogram: output
 	$(PYTHON) $(SRC)/histogram.py $(DATASET_TRAIN)
 
-histogram_all: output
-	$(PYTHON) $(SRC)/histogram.py $(DATASET_TRAIN) --all
-
 scatter: output
 	$(PYTHON) $(SRC)/scatter_plot.py $(DATASET_TRAIN)
-
-scatter_all: output
-	$(PYTHON) $(SRC)/scatter_plot.py $(DATASET_TRAIN) --all
-
+	
 pair: output
 	$(PYTHON) $(SRC)/pair_plot.py $(DATASET_TRAIN)
 	
